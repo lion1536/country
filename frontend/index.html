@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API de Países</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Nunito Sans", sans-serif;
+        background-color: var(--bg-light, #f2f2f2);
+        color: var(--text-light, #111);
+        overflow-x: hidden;
+      }
+
+      img {
+        width: 24px;
+        height: 24px;
+        object-fit: cover;
+      }
+
+      #cabecalho {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        background-color: hsl(0, 0%, 98%);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      #mode {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0.5rem;
+        flex-shrink: 0;
+      }
+
+      #type {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+
+      input {
+        width: 200px;
+        padding: 0.5rem;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        outline: none;
+        transition: border-color 0.3s ease;
+      }
+
+      input:focus {
+        border-color: #ec0f0f;
+      }
+
+      #selecionar {
+        display: flex;
+        justify-content: center;
+        margin: 1rem;
+      }
+
+      #paises {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        padding: 2rem;
+      }
+
+      .pais {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: transform 0.2s;
+        max-width: 280px;
+      }
+
+      .pais:hover {
+        transform: scale(1.03);
+      }
+
+      .pais img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        display: block;
+      }
+
+      .pais .info {
+        padding: 1rem;
+      }
+
+      .pais .info h2 {
+        font-size: 1.1rem;
+        margin: 0 0 0.5rem;
+      }
+
+      .pais .info p {
+        margin: 0.2rem 0;
+        font-size: 0.9rem;
+      }
+
+      /* Modo escuro */
+      body.dark {
+        background-color: hsl(207, 26%, 17%);
+        color: white;
+      }
+
+      body.dark #cabecalho {
+        background-color: hsl(209, 23%, 22%);
+      }
+
+      body.dark .pais {
+        background-color: hsl(209, 23%, 22%);
+      }
+
+      body.dark input,
+      body.dark select {
+        background-color: hsl(209, 23%, 22%);
+        color: white;
+        border: none;
+      }
+
+      .dark #mode {
+        color: white;
+      }
+
+      /* Responsividade */
+      @media (max-width: 768px) {
+        #paises {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cabecalho">
+      <h1>Where in the world?</h1>
+      <button id="mode">
+        <img id="imagem" src="../svg/moon-svgrepo-com.svg" alt="Lua" />
+        <span>Dark Mode</span>
+      </button>
+    </div>
+
+    <div id="type">
+      <input type="text" id="busca" placeholder="Search for country..." />
+    </div>
+    <div id="selecionar">
+      <select id="filtroRegiao">
+        <option value="">Filter by region</option>
+      </select>
+    </div>
+
+    <div id="paises"></div>
+    <script defer>
+      let paises = []; // Variável global
+
+      // Carrega todos os países da API
+      async function carregarPaises() {
+        try {
+          const res = await fetch(
+            "https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital"
+          );
+          paises = await res.json();
+          exibirPaises(paises);
+          preencherFiltroRegiao(); // Preenche o <select> de regiões
+        } catch (error) {
+          console.error("Erro ao carregar países:", error);
+        }
+      }
+
+      // Exibe todos os países
+      function exibirPaises(lista) {
+        const container = document.getElementById("paises");
+        container.innerHTML = "";
+
+        lista.forEach((pais) => {
+          const link = document.createElement("a");
+          link.href = `detalhes.html?pais=${encodeURIComponent(
+            pais.name.common
+          )}`;
+          link.style.textDecoration = "none";
+          link.style.color = "inherit";
+
+          const div = document.createElement("div");
+          div.className = "pais";
+
+          div.innerHTML = `
+      <img src="${pais.flags.svg}" alt="Bandeira de ${pais.name.common}" />
+      <div class="info">
+        <h2>${pais.name.common}</h2>
+        <p><strong>Population:</strong> ${pais.population.toLocaleString()}</p>
+        <p><strong>Region:</strong> ${pais.region}</p>
+        <p><strong>Capital:</strong> ${
+          pais.capital ? pais.capital[0] : "N/A"
+        }</p>
+      </div>
+    `;
+
+          link.appendChild(div);
+          container.appendChild(link);
+        });
+      }
+
+      // Troca entre Dark e Light Mode
+      const botaoModo = document.getElementById("mode");
+      const imagem = document.getElementById("imagem");
+
+      botaoModo.addEventListener("click", () => {
+        document.body.classList.toggle("dark");
+
+        const modoAtivo = document.body.classList.contains("dark");
+        imagem.src = modoAtivo
+          ? "../svg/sun-white.svg"
+          : "../svg/moon-svgrepo-com.svg";
+        imagem.alt = modoAtivo ? "Sol" : "Lua";
+
+        botaoModo.querySelector("span").textContent = modoAtivo
+          ? "Light Mode"
+          : "Dark Mode";
+      });
+
+      // Filtro por busca + região
+      const inputBusca = document.getElementById("busca");
+      const filtroRegiao = document.getElementById("filtroRegiao");
+
+      function aplicarFiltros() {
+        const textoBusca = inputBusca.value.toLowerCase();
+        const regiaoSelecionada = filtroRegiao.value;
+
+        const resultado = paises.filter((pais) => {
+          const nome = pais.name.common.toLowerCase();
+          const pertenceRegiao =
+            regiaoSelecionada === "" || pais.region === regiaoSelecionada;
+          const correspondeBusca = nome.includes(textoBusca);
+
+          return pertenceRegiao && correspondeBusca;
+        });
+
+        exibirPaises(resultado);
+      }
+
+      inputBusca.addEventListener("input", aplicarFiltros);
+      filtroRegiao.addEventListener("change", aplicarFiltros);
+
+      // Adiciona as opções no <select> de regiões
+      function preencherFiltroRegiao() {
+        const regioes = ["Africa", "Americas", "Asia", "Europe", "Oceania"];
+        regioes.forEach((regiao) => {
+          const option = document.createElement("option");
+          option.value = regiao;
+          option.textContent = regiao;
+          filtroRegiao.appendChild(option);
+        });
+      }
+
+      // Inicializa tudo
+      carregarPaises();
+    </script>
+  </body>
+</html>

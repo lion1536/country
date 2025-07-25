@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalhes do País</title>
+    <style>
+      :root {
+        --bg-light: hsl(0, 0%, 98%);
+        --text-light: hsl(200, 15%, 8%);
+        --bg-dark: hsl(207, 26%, 17%);
+        --text-dark: hsl(0, 0%, 100%);
+        --element-light: white;
+        --element-dark: hsl(209, 23%, 22%);
+      }
+
+      body {
+        font-family: "Nunito Sans", sans-serif;
+        margin: 0;
+        padding: 2rem;
+        background-color: var(--bg-light);
+        color: var(--text-light);
+        transition: all 0.3s ease;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      button {
+        padding: 0.5rem 1rem;
+        background-color: var(--element-light);
+        border: none;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.3s ease;
+      }
+
+      .dark {
+        background-color: var(--bg-dark);
+        color: var(--text-dark);
+      }
+
+      .dark button {
+        background-color: var(--element-dark);
+        color: var(--text-dark);
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        max-width: 900px;
+        margin: auto;
+      }
+
+      .band {
+        width: 100%;
+        max-width: 500px;
+        object-fit: contain;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+
+      .borders {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .borders a {
+        text-decoration: none;
+        background-color: var(--element-light);
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        color: inherit;
+        transition: background-color 0.2s;
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .dark .borders a {
+        background-color: var(--element-dark);
+      }
+
+      .borders a:hover {
+        opacity: 0.8;
+      }
+
+      @media (min-width: 768px) {
+        .container {
+          flex-direction: row;
+          align-items: center;
+        }
+
+        .info {
+          padding-left: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <button onclick="history.back()">← Back</button>
+      <button id="toggleTheme">
+        <img id="themeIcon" src="../svg/moon-svgrepo-com.svg" width="20" />
+        <span id="themeText">Dark Mode</span>
+      </button>
+    </header>
+
+    <div class="container" id="detalhes"></div>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const nomePais = urlParams.get("pais");
+
+      async function carregarDetalhes() {
+        try {
+          const res = await fetch(
+            `https://restcountries.com/v3.1/name/${encodeURIComponent(
+              nomePais
+            )}?fullText=true`
+          );
+          const dados = await res.json();
+          const pais = dados[0];
+
+          const codigos = pais.borders || [];
+
+          const nomesVizinhos = codigos.length
+            ? await buscarNomesPorCodigos(codigos)
+            : [];
+
+          const container = document.getElementById("detalhes");
+          container.innerHTML = `
+            <img class="band" src="${pais.flags.svg}" alt="Bandeira de ${
+            pais.name.common
+          }" />
+            <div class="info">
+              <h1>${pais.name.common}</h1>
+              <p><strong>Official Name:</strong> ${pais.name.official}</p>
+              <p><strong>Top Level Domain:</strong> ${
+                pais.tld?.join(", ") ?? "N/A"
+              }</p>
+              <p><strong>Population:</strong> ${pais.population.toLocaleString()}</p>
+              <p><strong>Region:</strong> ${pais.region}</p>
+              <p><strong>Subregion:</strong> ${pais.subregion}</p>
+              <p><strong>Capital:</strong> ${pais.capital?.[0] ?? "N/A"}</p>
+              <p><strong>Languages:</strong> ${
+                pais.languages
+                  ? Object.values(pais.languages).join(", ")
+                  : "N/A"
+              }</p>
+              <p><strong>Currencies:</strong> ${
+                pais.currencies
+                  ? Object.values(pais.currencies)
+                      .map((m) => `${m.name} (${m.symbol})`)
+                      .join(", ")
+                  : "N/A"
+              }</p>
+              ${
+                nomesVizinhos.length
+                  ? `<p><strong>Border Countries:</strong></p>
+                     <div class="borders">
+                       ${nomesVizinhos
+                         .map(
+                           (nome) =>
+                             `<a href="detalhes.html?pais=${encodeURIComponent(
+                               nome
+                             )}">${nome}</a>`
+                         )
+                         .join("")}
+                     </div>`
+                  : ""
+              }
+            </div>
+          `;
+        } catch (error) {
+          document.getElementById("detalhes").textContent =
+            "Erro ao carregar país.";
+        }
+      }
+
+      async function buscarNomesPorCodigos(codigos) {
+        const res = await fetch(
+          `https://restcountries.com/v3.1/alpha?codes=${codigos.join(",")}`
+        );
+        const dados = await res.json();
+        return dados.map((pais) => pais.name.common);
+      }
+
+      carregarDetalhes();
+
+      // Modo escuro/claro
+      const btnTema = document.getElementById("toggleTheme");
+      const iconTema = document.getElementById("themeIcon");
+      const textoTema = document.getElementById("themeText");
+
+      btnTema.addEventListener("click", () => {
+        document.body.classList.toggle("dark");
+
+        const darkAtivo = document.body.classList.contains("dark");
+        iconTema.src = darkAtivo
+          ? "../svg/sun-white.svg"
+          : "../svg/moon-svgrepo-com.svg";
+        textoTema.textContent = darkAtivo ? "Light Mode" : "Dark Mode";
+      });
+    </script>
+  </body>
+</html>
