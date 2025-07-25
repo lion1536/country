@@ -116,7 +116,7 @@
     <header>
       <button onclick="history.back()">← Back</button>
       <button id="toggleTheme">
-        <img id="themeIcon" src="../svg/moon-svgrepo-com.svg" width="20" />
+        <img id="themeIcon" src="svg/moon-svgrepo-com.svg" width="20" />
         <span id="themeText">Dark Mode</span>
       </button>
     </header>
@@ -177,7 +177,7 @@
                        ${nomesVizinhos
                          .map(
                            (nome) =>
-                             `<a href="detalhes.html?pais=${encodeURIComponent(
+                             `<a href="/frontend/detalhes.html?pais=${encodeURIComponent(
                                nome
                              )}">${nome}</a>`
                          )
@@ -213,8 +213,8 @@
 
         const darkAtivo = document.body.classList.contains("dark");
         iconTema.src = darkAtivo
-          ? "../svg/sun-white.svg"
-          : "../svg/moon-svgrepo-com.svg";
+          ? "svg/sun-white.svg"
+          : "svg/moon-svgrepo-com.svg";
         textoTema.textContent = darkAtivo ? "Light Mode" : "Dark Mode";
       });
     </script>

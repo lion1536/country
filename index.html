@@ -151,7 +151,7 @@
     <div id="cabecalho">
       <h1>Where in the world?</h1>
       <button id="mode">
-        <img id="imagem" src="../svg/moon-svgrepo-com.svg" alt="Lua" />
+        <img id="imagem" src="svg/moon-svgrepo-com.svg" alt="Lua" />
         <span>Dark Mode</span>
       </button>
     </div>
@@ -225,8 +225,8 @@
 
         const modoAtivo = document.body.classList.contains("dark");
         imagem.src = modoAtivo
-          ? "../svg/sun-white.svg"
-          : "../svg/moon-svgrepo-com.svg";
+          ? "svg/sun-white.svg"
+          : "svg/moon-svgrepo-com.svg";
         imagem.alt = modoAtivo ? "Sol" : "Lua";
 
         botaoModo.querySelector("span").textContent = modoAtivo
