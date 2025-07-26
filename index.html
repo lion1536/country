@@ -12,7 +12,7 @@
       body {
         margin: 0;
         padding: 0;
-        font-family: "Nunito Sans", sans-serif;
+        font-family: 'Nunito Sans', sans-serif;
         background-color: var(--bg-light, #f2f2f2);
         color: var(--text-light, #111);
         overflow-x: hidden;
@@ -167,37 +167,37 @@
 
     <div id="paises"></div>
     <script defer>
-      let paises = []; // Variável global
+      let paises = [] // Variável global
 
       // Carrega todos os países da API
       async function carregarPaises() {
         try {
           const res = await fetch(
-            "https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital"
-          );
-          paises = await res.json();
-          exibirPaises(paises);
-          preencherFiltroRegiao(); // Preenche o <select> de regiões
+            'https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital',
+          )
+          paises = await res.json()
+          exibirPaises(paises)
+          preencherFiltroRegiao() // Preenche o <select> de regiões
         } catch (error) {
-          console.error("Erro ao carregar países:", error);
+          console.error('Erro ao carregar países:', error)
         }
       }
 
       // Exibe todos os países
       function exibirPaises(lista) {
-        const container = document.getElementById("paises");
-        container.innerHTML = "";
+        const container = document.getElementById('paises')
+        container.innerHTML = ''
 
         lista.forEach((pais) => {
-          const link = document.createElement("a");
-          link.href = `frontend/detalhes.html?pais=${encodeURIComponent(
-            pais.name.common
-          )}`;
-          link.style.textDecoration = "none";
-          link.style.color = "inherit";
+          const link = document.createElement('a')
+          link.href = `detalhes.html?pais=${encodeURIComponent(
+            pais.name.common,
+          )}`
+          link.style.textDecoration = 'none'
+          link.style.color = 'inherit'
 
-          const div = document.createElement("div");
-          div.className = "pais";
+          const div = document.createElement('div')
+          div.className = 'pais'
 
           div.innerHTML = `
       <img src="${pais.flags.svg}" alt="Bandeira de ${pais.name.common}" />
@@ -206,70 +206,70 @@
         <p><strong>Population:</strong> ${pais.population.toLocaleString()}</p>
         <p><strong>Region:</strong> ${pais.region}</p>
         <p><strong>Capital:</strong> ${
-          pais.capital ? pais.capital[0] : "N/A"
+          pais.capital ? pais.capital[0] : 'N/A'
         }</p>
       </div>
-    `;
+    `
 
-          link.appendChild(div);
-          container.appendChild(link);
-        });
+          link.appendChild(div)
+          container.appendChild(link)
+        })
       }
 
       // Troca entre Dark e Light Mode
-      const botaoModo = document.getElementById("mode");
-      const imagem = document.getElementById("imagem");
+      const botaoModo = document.getElementById('mode')
+      const imagem = document.getElementById('imagem')
 
-      botaoModo.addEventListener("click", () => {
-        document.body.classList.toggle("dark");
+      botaoModo.addEventListener('click', () => {
+        document.body.classList.toggle('dark')
 
-        const modoAtivo = document.body.classList.contains("dark");
+        const modoAtivo = document.body.classList.contains('dark')
         imagem.src = modoAtivo
-          ? "svg/sun-white.svg"
-          : "svg/moon-svgrepo-com.svg";
-        imagem.alt = modoAtivo ? "Sol" : "Lua";
+          ? 'svg/sun-white.svg'
+          : 'svg/moon-svgrepo-com.svg'
+        imagem.alt = modoAtivo ? 'Sol' : 'Lua'
 
-        botaoModo.querySelector("span").textContent = modoAtivo
-          ? "Light Mode"
-          : "Dark Mode";
-      });
+        botaoModo.querySelector('span').textContent = modoAtivo
+          ? 'Light Mode'
+          : 'Dark Mode'
+      })
 
       // Filtro por busca + região
-      const inputBusca = document.getElementById("busca");
-      const filtroRegiao = document.getElementById("filtroRegiao");
+      const inputBusca = document.getElementById('busca')
+      const filtroRegiao = document.getElementById('filtroRegiao')
 
       function aplicarFiltros() {
-        const textoBusca = inputBusca.value.toLowerCase();
-        const regiaoSelecionada = filtroRegiao.value;
+        const textoBusca = inputBusca.value.toLowerCase()
+        const regiaoSelecionada = filtroRegiao.value
 
         const resultado = paises.filter((pais) => {
-          const nome = pais.name.common.toLowerCase();
+          const nome = pais.name.common.toLowerCase()
           const pertenceRegiao =
-            regiaoSelecionada === "" || pais.region === regiaoSelecionada;
-          const correspondeBusca = nome.includes(textoBusca);
+            regiaoSelecionada === '' || pais.region === regiaoSelecionada
+          const correspondeBusca = nome.includes(textoBusca)
 
-          return pertenceRegiao && correspondeBusca;
-        });
+          return pertenceRegiao && correspondeBusca
+        })
 
-        exibirPaises(resultado);
+        exibirPaises(resultado)
       }
 
-      inputBusca.addEventListener("input", aplicarFiltros);
-      filtroRegiao.addEventListener("change", aplicarFiltros);
+      inputBusca.addEventListener('input', aplicarFiltros)
+      filtroRegiao.addEventListener('change', aplicarFiltros)
 
       // Adiciona as opções no <select> de regiões
       function preencherFiltroRegiao() {
-        const regioes = ["Africa", "Americas", "Asia", "Europe", "Oceania"];
+        const regioes = ['Africa', 'Americas', 'Asia', 'Europe', 'Oceania']
         regioes.forEach((regiao) => {
-          const option = document.createElement("option");
-          option.value = regiao;
-          option.textContent = regiao;
-          filtroRegiao.appendChild(option);
-        });
+          const option = document.createElement('option')
+          option.value = regiao
+          option.textContent = regiao
+          filtroRegiao.appendChild(option)
+        })
       }
 
       // Inicializa tudo
-      carregarPaises();
+      carregarPaises()
     </script>
   </body>
 </html>
