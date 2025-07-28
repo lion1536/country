@@ -132,7 +132,13 @@
       body.dark select {
         background-color: hsl(209, 23%, 22%);
         color: white;
-        border: none;
+        border: 1px solid #333;
+        outline: none;
+        transition: border-color 0.3s ease;
+      }
+
+      body.dark input:focus {
+        border-color: #00bfff;
       }
 
       .dark #mode {
